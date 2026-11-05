@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Inventory } from '../models';
+import { Category, Inventory, Weight } from '../models';
 
 export interface InventorySearchParams {
   q?: string;
@@ -44,6 +44,14 @@ export class InventoryService {
 
   getById(id: number): Observable<Inventory> {
     return this.http.get<Inventory>(`${this.apiUrl}/${id}`);
+  }
+
+  getCategories(): Observable<Category[]> {
+    return this.http.get<Category[]>('http://localhost:8000/categories');
+  }
+
+  getWeights(): Observable<Weight[]> {
+    return this.http.get<Weight[]>('http://localhost:8000/weights');
   }
 
   create(inventory: Partial<Inventory>): Observable<Inventory> {

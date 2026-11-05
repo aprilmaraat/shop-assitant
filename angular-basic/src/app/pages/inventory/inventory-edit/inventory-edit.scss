@@ -1,0 +1,11 @@
+.modal-actions {
+	display: flex;
+	justify-content: flex-end;
+	gap: 8px;
+	margin-top: 24px;
+}
+
+nz-input-number,
+nz-select {
+	width: 100%;
+}

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzButtonModule } from 'ng-zorro-antd/button';
@@ -6,6 +6,8 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { Inventory } from '../../models';
 import { InventoryService } from '../../services/inventory.service';
+import { NzModalService } from 'ng-zorro-antd/modal';
+import { InventoryEdit } from './inventory-edit/inventory-edit';
 
 @Component({
   selector: 'app-inventory',
@@ -14,6 +16,8 @@ import { InventoryService } from '../../services/inventory.service';
   styleUrl: './inventory.scss'
 })
 export class InventoryComponent implements OnInit {
+  private readonly modalService = inject(NzModalService);
+
   inventoryData: Inventory[] = [];
   isLoading = false;
 
@@ -37,6 +41,22 @@ export class InventoryComponent implements OnInit {
         console.error('Error loading inventory:', error);
         this.message.error('Failed to load inventory data');
         this.isLoading = false;
+      }
+    });
+  }
+
+  openEdit(id: number): void {
+    const modal = this.modalService.create<InventoryEdit, { itemId: number }, Inventory>({
+      nzTitle: 'Edit inventory item',
+      nzContent: InventoryEdit,
+      nzData: { itemId: id },
+      nzFooter: null,
+      nzMaskClosable: false
+    });
+
+    modal.afterClose.subscribe((updatedItem) => {
+      if (updatedItem) {
+        this.loadInventory();
       }
     });
   }
