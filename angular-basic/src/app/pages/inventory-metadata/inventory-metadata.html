@@ -1,15 +1,15 @@
-<div class="catalog-container">
+<div class="inventory-metadata-container">
   <div class="page-header">
     <h1>{{ title }}</h1>
     <button nz-button nzType="primary" (click)="openForm()">
       <nz-icon nzType="plus" nzTheme="outline"></nz-icon>
-      Add {{ catalogType === 'categories' ? 'category' : 'weight' }}
+      Add {{ metadataType === 'categories' ? 'category' : 'weight' }}
     </button>
   </div>
 
   <nz-table
-    #catalogTable
-    [nzData]="catalogData"
+    #metadataTable
+    [nzData]="metadataItems"
     [nzLoading]="isLoading"
     [nzPageSize]="10"
     [nzShowTotal]="totalTemplate"
@@ -23,7 +23,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let item of catalogTable.data">
+      <tr *ngFor="let item of metadataTable.data">
         <td>{{ item.id }}</td>
         <td>{{ item.name }}</td>
         <td>{{ item.description || '-' }}</td>

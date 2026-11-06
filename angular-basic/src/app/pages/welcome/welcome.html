@@ -106,13 +106,13 @@
 				<h2 id="inventory-heading">Inventory tracking</h2>
 			</div>
 			<div class="filters">
-				<select aria-label="Filter inventory by category" [value]="selectedCategoryId ?? ''" (change)="changeCategory($event)">
+				<select aria-label="Filter inventory by category" [value]="selectedCategoryId() ?? ''" (change)="changeCategory($event)">
 					<option value="">All categories</option>
 					@for (category of categories(); track category.id) {
 						<option [value]="category.id">{{ category.name }}</option>
 					}
 				</select>
-				<select aria-label="Filter inventory by weight" [value]="selectedWeightId ?? ''" (change)="changeWeight($event)">
+				<select aria-label="Filter inventory by weight" [value]="selectedWeightId() ?? ''" (change)="changeWeight($event)">
 					<option value="">All weights</option>
 					@for (weight of weights(); track weight.id) {
 						<option [value]="weight.id">{{ weight.name }}</option>

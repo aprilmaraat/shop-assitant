@@ -1,5 +1,8 @@
 .dashboard {
 	max-width: 1440px;
+	max-height: calc(100dvh - 160px);
+	overflow-y: auto;
+	overscroll-behavior-y: contain;
 	margin: 0 auto;
 	padding: 8px 0 32px;
 	color: #202b2a;

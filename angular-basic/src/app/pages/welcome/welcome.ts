@@ -55,8 +55,8 @@ export class Welcome implements OnInit {
   readonly weights = signal<Weight[]>([]);
   readonly inventoryLoading = signal(false);
   readonly inventoryError = signal('');
-  selectedCategoryId: number | null = null;
-  selectedWeightId: number | null = null;
+  readonly selectedCategoryId = signal<number | null>(null);
+  readonly selectedWeightId = signal<number | null>(null);
 
   readonly filteredTransactions = computed(() => {
     const transactions = this.transactions() ?? [];
@@ -137,10 +137,12 @@ export class Welcome implements OnInit {
   readonly inventoryBars = computed<InventoryBar[]>(() => {
     const categories = this.categories();
     const weights = this.weights();
+    const categoryId = this.selectedCategoryId();
+    const weightId = this.selectedWeightId();
     const palette = ['#167d68', '#d17a31', '#5577a2', '#9e4861', '#786846'];
     const rows = this.inventory()
-      .filter((item) => this.selectedCategoryId === null || item.category_id === this.selectedCategoryId)
-      .filter((item) => this.selectedWeightId === null || item.weight_id === this.selectedWeightId)
+      .filter((item) => categoryId === null || item.category_id === categoryId)
+      .filter((item) => weightId === null || item.weight_id === weightId)
       .map((item) => {
         const categoryIndex = categories.findIndex((category) => category.id === item.category_id);
         return {
@@ -191,12 +193,12 @@ export class Welcome implements OnInit {
 
   changeCategory(event: Event): void {
     const value = (event.target as HTMLSelectElement).value;
-    this.selectedCategoryId = value ? Number(value) : null;
+    this.selectedCategoryId.set(value ? Number(value) : null);
   }
 
   changeWeight(event: Event): void {
     const value = (event.target as HTMLSelectElement).value;
-    this.selectedWeightId = value ? Number(value) : null;
+    this.selectedWeightId.set(value ? Number(value) : null);
   }
 
   refresh(): void {
