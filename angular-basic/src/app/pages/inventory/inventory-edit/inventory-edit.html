@@ -1,0 +1,53 @@
+<nz-spin [nzSpinning]="loading()">
+    <form nz-form nzLayout="vertical" [formGroup]="inventoryForm" (ngSubmit)="submitForm()">
+        <nz-form-item>
+            <nz-form-label nzRequired nzFor="name">Name</nz-form-label>
+            <nz-form-control nzErrorTip="Please enter an item name">
+                <input nz-input id="name" formControlName="name" placeholder="Item name" />
+            </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+            <nz-form-label nzFor="shortname">Short name</nz-form-label>
+            <nz-form-control>
+                <input nz-input id="shortname" formControlName="shortname" placeholder="Optional short name" />
+            </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+            <nz-form-label nzRequired nzFor="quantity">Quantity</nz-form-label>
+            <nz-form-control nzErrorTip="Enter a quantity of zero or more">
+                <nz-input-number id="quantity" formControlName="quantity" [nzMin]="0" [nzStep]="0.01" />
+            </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+            <nz-form-label nzRequired nzFor="category_id">Category</nz-form-label>
+            <nz-form-control nzErrorTip="Please select a category">
+                <nz-select id="category_id" formControlName="category_id" nzPlaceHolder="Select a category">
+                    @for (category of categories(); track category.id) {
+                        <nz-option [nzValue]="category.id" [nzLabel]="category.name" />
+                    }
+                </nz-select>
+            </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+            <nz-form-label nzRequired nzFor="weight_id">Weight</nz-form-label>
+            <nz-form-control nzErrorTip="Please select a weight">
+                <nz-select id="weight_id" formControlName="weight_id" nzPlaceHolder="Select a weight">
+                    @for (weight of weights(); track weight.id) {
+                        <nz-option [nzValue]="weight.id" [nzLabel]="weight.name" />
+                    }
+                </nz-select>
+            </nz-form-control>
+        </nz-form-item>
+
+        <div class="modal-actions">
+            <button nz-button type="button" (click)="destroyModal()" [disabled]="saving()">Cancel</button>
+            <button nz-button nzType="primary" type="submit" [nzLoading]="saving()" [disabled]="loading()">
+                Save changes
+            </button>
+        </div>
+    </form>
+</nz-spin>
