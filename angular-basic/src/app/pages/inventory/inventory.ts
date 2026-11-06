@@ -8,6 +8,7 @@ import { Inventory } from '../../models';
 import { InventoryService } from '../../services/inventory.service';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { InventoryEdit } from './inventory-edit/inventory-edit';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-inventory',
@@ -19,6 +20,8 @@ export class InventoryComponent implements OnInit {
   private readonly modalService = inject(NzModalService);
 
   inventoryData: Inventory[] = [];
+  categoryNames = new Map<number, string>();
+  weightNames = new Map<number, string>();
   isLoading = false;
 
   constructor(
@@ -32,9 +35,15 @@ export class InventoryComponent implements OnInit {
 
   loadInventory(): void {
     this.isLoading = true;
-    this.inventoryService.getAll(0, 100).subscribe({
-      next: (data) => {
-        this.inventoryData = data;
+    forkJoin({
+      inventory: this.inventoryService.getAll(0, 100),
+      categories: this.inventoryService.getCategories(),
+      weights: this.inventoryService.getWeights()
+    }).subscribe({
+      next: ({ inventory, categories, weights }) => {
+        this.inventoryData = inventory;
+        this.categoryNames = new Map(categories.map((category) => [category.id, category.name]));
+        this.weightNames = new Map(weights.map((weight) => [weight.id, weight.name]));
         this.isLoading = false;
       },
       error: (error) => {

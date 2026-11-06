@@ -1,1 +1,156 @@
-<p>welcome works!</p>
+<main class="dashboard">
+	<header class="dashboard-header">
+		<div>
+			<p class="eyebrow">BUSINESS OVERVIEW</p>
+			<h1>Dashboard</h1>
+			<p class="header-subtitle">Transactions and stock, in one place.</p>
+		</div>
+		<button nz-button (click)="refresh()" [disabled]="transactionLoading() || inventoryLoading()">
+			<nz-icon nzType="reload" nzTheme="outline"></nz-icon>
+			Refresh
+		</button>
+	</header>
+
+	<section class="summary-grid" aria-label="Transaction summary">
+		<article class="summary-item expense-summary">
+			<span class="summary-label">Expenses</span>
+			<strong>{{ summary().expense | number:'1.2-2' }}</strong>
+			<span class="summary-period">{{ periodLabel() }}</span>
+		</article>
+		<article class="summary-item earning-summary">
+			<span class="summary-label">Earnings</span>
+			<strong>{{ summary().earning | number:'1.2-2' }}</strong>
+			<span class="summary-period">{{ periodLabel() }}</span>
+		</article>
+		<article class="summary-item treasury-summary">
+			<span class="summary-label">Business treasury</span>
+			<strong>{{ summary().treasury | number:'1.2-2' }}</strong>
+			<span class="summary-period">Capital - expenses + earnings</span>
+		</article>
+		<article class="summary-item net-summary">
+			<span class="summary-label">Net earnings</span>
+			<strong>{{ summary().netEarnings | number:'1.2-2' }}</strong>
+			<span class="summary-period">Earnings less purchase cost</span>
+		</article>
+	</section>
+
+	<section class="dashboard-section transaction-section" aria-labelledby="transactions-heading">
+		<div class="section-heading">
+			<div>
+				<p class="eyebrow">CASH FLOW</p>
+				<h2 id="transactions-heading">Transaction analytics</h2>
+			</div>
+			<div class="filters">
+				<div class="view-toggle" role="group" aria-label="Transaction period">
+					<button type="button" [class.active]="viewMode() === 'monthly'" [attr.aria-pressed]="viewMode() === 'monthly'" (click)="setViewMode('monthly')">Monthly</button>
+					<button type="button" [class.active]="viewMode() === 'daily'" [attr.aria-pressed]="viewMode() === 'daily'" (click)="setViewMode('daily')">Daily</button>
+				</div>
+				@if (viewMode() === 'monthly') {
+					<input aria-label="Select month" type="month" [value]="selectedMonth()" (change)="changeMonth($event)" />
+				} @else {
+					<input aria-label="Select day" type="date" [value]="selectedDate()" (change)="changeDate($event)" />
+				}
+				<select aria-label="Filter transaction type" [value]="transactionFilter()" (change)="changeTransactionFilter($event)">
+					<option value="all">All transaction types</option>
+					<option value="expense">Expenses</option>
+					<option value="earning">Earnings</option>
+					<option value="capital">Capital</option>
+				</select>
+			</div>
+		</div>
+
+		@if (transactionError()) {
+			<div class="notice notice-error" role="alert">{{ transactionError() }}</div>
+		}
+
+		<div class="chart-panel" [class.is-loading]="transactionLoading()">
+			@if (transactionLoading() && transactions() === null) {
+				<div class="loading-state"><nz-spin nzSimple></nz-spin><span>Loading transactions</span></div>
+			} @else if (filteredTransactions().length === 0 && !transactionLoading()) {
+				<div class="empty-state">
+					<span class="empty-mark">—</span>
+					<strong>No transactions for {{ periodLabel() }}</strong>
+					<span>Recorded expenses, earnings, and capital will appear here.</span>
+				</div>
+			} @else {
+				<div class="chart-meta">
+					<span>{{ viewMode() === 'monthly' ? 'Daily totals' : 'Hourly totals' }} <b>{{ periodLabel() }}</b></span>
+					<div class="legend" aria-label="Chart legend">
+						<span><i class="legend-expense"></i>Expense</span>
+						<span><i class="legend-earning"></i>Earning</span>
+						<span><i class="legend-capital"></i>Capital</span>
+					</div>
+				</div>
+				<div class="chart-scroll">
+					<div class="transaction-chart" [class.hourly-chart]="viewMode() === 'daily'" role="img" [attr.aria-label]="'Transaction totals for ' + periodLabel()">
+						@for (point of transactionPoints(); track point.label) {
+							<div class="chart-column" [title]="'Period ' + point.label + ': expenses ' + (point.expense | number:'1.2-2') + ', earnings ' + (point.earning | number:'1.2-2') + ', capital ' + (point.capital | number:'1.2-2')">
+								<div class="bar-group">
+									<span class="chart-bar bar-expense" [style.height]="point.expenseHeight + '%'"></span>
+									<span class="chart-bar bar-earning" [style.height]="point.earningHeight + '%'"></span>
+									<span class="chart-bar bar-capital" [style.height]="point.capitalHeight + '%'"></span>
+								</div>
+								<span class="chart-label">{{ point.label }}</span>
+							</div>
+						}
+					</div>
+				</div>
+			}
+		</div>
+	</section>
+
+	<section class="dashboard-section inventory-section" aria-labelledby="inventory-heading">
+		<div class="section-heading">
+			<div>
+				<p class="eyebrow">STOCK LEVELS</p>
+				<h2 id="inventory-heading">Inventory tracking</h2>
+			</div>
+			<div class="filters">
+				<select aria-label="Filter inventory by category" [value]="selectedCategoryId ?? ''" (change)="changeCategory($event)">
+					<option value="">All categories</option>
+					@for (category of categories(); track category.id) {
+						<option [value]="category.id">{{ category.name }}</option>
+					}
+				</select>
+				<select aria-label="Filter inventory by weight" [value]="selectedWeightId ?? ''" (change)="changeWeight($event)">
+					<option value="">All weights</option>
+					@for (weight of weights(); track weight.id) {
+						<option [value]="weight.id">{{ weight.name }}</option>
+					}
+				</select>
+			</div>
+		</div>
+
+		@if (inventoryError()) {
+			<div class="notice notice-error" role="alert">{{ inventoryError() }}</div>
+		}
+
+		<div class="inventory-panel" [class.is-loading]="inventoryLoading()">
+			@if (inventoryLoading() && inventory().length === 0) {
+				<div class="loading-state"><nz-spin nzSimple></nz-spin><span>Loading inventory</span></div>
+			} @else if (inventoryBars().length === 0 && !inventoryLoading()) {
+				<div class="empty-state">
+					<span class="empty-mark">—</span>
+					<strong>No inventory matches these filters</strong>
+					<span>Try another category or weight, or add an item from Inventory.</span>
+				</div>
+			} @else {
+				<div class="inventory-list">
+					@for (item of inventoryBars(); track item.id) {
+						<div class="inventory-row">
+							<div class="inventory-description">
+								<strong>{{ item.name }}</strong>
+								<span>{{ item.category }} <i>·</i> {{ item.weight }}</span>
+							</div>
+							<div class="quantity-track" [attr.aria-label]="item.quantity + ' units'">
+								<span [style.width]="item.width + '%'" [style.backgroundColor]="item.color"></span>
+							</div>
+							<strong class="quantity-value">{{ item.quantity | number:'1.0-3' }}</strong>
+						</div>
+					}
+				</div>
+				<p class="inventory-footnote">{{ inventoryBars().length }} item{{ inventoryBars().length === 1 ? '' : 's' }} shown, ordered by quantity</p>
+			}
+		</div>
+	</section>
+</main>

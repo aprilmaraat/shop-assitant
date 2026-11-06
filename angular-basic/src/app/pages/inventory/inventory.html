@@ -31,8 +31,8 @@
         <td>{{ item.name }}</td>
         <td>{{ item.shortname || '-' }}</td>
         <td>{{ item.quantity }}</td>
-        <td>{{ item.category?.name || '-' }}</td>
-        <td>{{ item.weight?.name || '-' }}</td>
+        <td>{{ categoryNames.get(item.category_id) || '-' }}</td>
+        <td>{{ weightNames.get(item.weight_id) || '-' }}</td>
         <td>
           <button nz-button nzType="link" nzSize="small" (click)="openEdit(item.id)">
             <nz-icon nzType="edit" nzTheme="outline"></nz-icon>
