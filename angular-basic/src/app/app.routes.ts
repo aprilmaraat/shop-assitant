@@ -5,6 +5,10 @@ export const routes: Routes = [
   { path: 'welcome', loadChildren: () => import('./pages/welcome/welcome.routes').then(m => m.WELCOME_ROUTES) },
   { path: 'inventory', loadChildren: () => import('./pages/inventory/inventory.routes').then(m => m.INVENTORY_ROUTES) },
   {
+    path: 'transactions',
+    loadComponent: () => import('./pages/transactions/transactions').then(m => m.TransactionsComponent)
+  },
+  {
     path: 'categories',
     loadComponent: () => import('./pages/inventory-metadata/inventory-metadata').then(m => m.InventoryMetadataComponent),
     data: { metadataType: 'categories' }

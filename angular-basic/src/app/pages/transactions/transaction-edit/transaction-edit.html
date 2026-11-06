@@ -1,0 +1,87 @@
+<nz-spin [nzSpinning]="loading()">
+  <form nz-form nzLayout="vertical" [formGroup]="transactionForm" (ngSubmit)="submitForm()">
+    <div class="form-grid">
+      <nz-form-item class="wide-field">
+        <nz-form-label nzRequired nzFor="title">Title</nz-form-label>
+        <nz-form-control nzErrorTip="Enter a transaction title">
+          <input nz-input id="title" formControlName="title" placeholder="e.g. Stock purchase" />
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label nzRequired nzFor="transaction_type">Type</nz-form-label>
+        <nz-form-control>
+          <nz-select id="transaction_type" formControlName="transaction_type">
+            <nz-option [nzValue]="'earning'" nzLabel="Earning"></nz-option>
+            <nz-option [nzValue]="'expense'" nzLabel="Expense"></nz-option>
+            <nz-option [nzValue]="'capital'" nzLabel="Capital"></nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label nzRequired nzFor="owner_id">Owner</nz-form-label>
+        <nz-form-control nzErrorTip="Select an owner">
+          <nz-select id="owner_id" formControlName="owner_id" nzPlaceHolder="Select owner" nzShowSearch>
+            @for (user of users(); track user.id) {
+              <nz-option [nzValue]="user.id" [nzLabel]="user.full_name || user.email"></nz-option>
+            }
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label nzRequired nzFor="date">Date and time</nz-form-label>
+        <nz-form-control nzErrorTip="Select a date and time">
+          <input nz-input id="date" type="datetime-local" formControlName="date" />
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label nzFor="inventory_id">Inventory item</nz-form-label>
+        <nz-form-control>
+          <nz-select id="inventory_id" formControlName="inventory_id" nzPlaceHolder="No linked item" nzAllowClear nzShowSearch>
+            @for (item of inventory(); track item.id) {
+              <nz-option [nzValue]="item.id" [nzLabel]="item.name"></nz-option>
+            }
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label nzRequired nzFor="quantity">Quantity</nz-form-label>
+        <nz-form-control nzErrorTip="Enter a quantity of zero or more">
+          <nz-input-number id="quantity" formControlName="quantity" [nzMin]="0" [nzStep]="0.001" />
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label nzRequired nzFor="amount_per_unit">Amount per unit</nz-form-label>
+        <nz-form-control nzErrorTip="Enter an amount of zero or more">
+          <nz-input-number id="amount_per_unit" formControlName="amount_per_unit" [nzMin]="0" [nzStep]="0.01" />
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label nzRequired nzFor="purchase_price">Purchase price per unit</nz-form-label>
+        <nz-form-control nzErrorTip="Enter a purchase price of zero or more">
+          <nz-input-number id="purchase_price" formControlName="purchase_price" [nzMin]="0" [nzStep]="0.01" />
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item class="wide-field">
+        <nz-form-label nzFor="description">Description</nz-form-label>
+        <nz-form-control>
+          <textarea nz-input id="description" formControlName="description" rows="3" placeholder="Optional details"></textarea>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+
+    <div class="modal-actions">
+      <button nz-button type="button" (click)="cancel()" [disabled]="saving()">Cancel</button>
+      <button nz-button nzType="primary" type="submit" [nzLoading]="saving()" [disabled]="loading()">
+        {{ data.transactionId === undefined ? 'Create transaction' : 'Save changes' }}
+      </button>
+    </div>
+  </form>
+</nz-spin>
