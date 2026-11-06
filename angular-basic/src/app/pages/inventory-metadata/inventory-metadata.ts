@@ -6,26 +6,26 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { NzTableModule } from 'ng-zorro-antd/table';
-import { CatalogEdit } from './catalog-edit/catalog-edit';
-import { CatalogItem, CatalogService, CatalogType } from '../../services/catalog.service';
+import { InventoryMetadataEdit } from './inventory-metadata-edit/inventory-metadata-edit';
+import { InventoryMetadataItem, InventoryMetadataService, InventoryMetadataType } from '../../services/inventory-metadata.service';
 
 @Component({
-  selector: 'app-catalog',
+  selector: 'app-inventory-metadata',
   imports: [CommonModule, NzButtonModule, NzIconModule, NzTableModule],
-  templateUrl: './catalog.html',
-  styleUrl: './catalog.scss'
+  templateUrl: './inventory-metadata.html',
+  styleUrl: './inventory-metadata.scss'
 })
-export class CatalogComponent implements OnInit {
+export class InventoryMetadataComponent implements OnInit {
   private readonly modalService = inject(NzModalService);
   private readonly route = inject(ActivatedRoute);
-  readonly catalogType = this.route.snapshot.data['catalogType'] as CatalogType;
-  readonly title = this.catalogType === 'categories' ? 'Categories' : 'Weights';
+  readonly metadataType = this.route.snapshot.data['metadataType'] as InventoryMetadataType;
+  readonly title = this.metadataType === 'categories' ? 'Categories' : 'Weights';
 
-  catalogData: CatalogItem[] = [];
+  metadataItems: InventoryMetadataItem[] = [];
   isLoading = false;
 
   constructor(
-    private readonly catalogService: CatalogService,
+    private readonly metadataService: InventoryMetadataService,
     private readonly message: NzMessageService
   ) {}
 
@@ -35,24 +35,24 @@ export class CatalogComponent implements OnInit {
 
   loadItems(): void {
     this.isLoading = true;
-    this.catalogService.getAll(this.catalogType).subscribe({
+    this.metadataService.getAll(this.metadataType).subscribe({
       next: (items) => {
-        this.catalogData = items;
+        this.metadataItems = items;
         this.isLoading = false;
       },
       error: (error) => {
-        console.error(`Error loading ${this.catalogType}:`, error);
+        console.error(`Error loading ${this.metadataType}:`, error);
         this.message.error(`Failed to load ${this.title.toLowerCase()}`);
         this.isLoading = false;
       }
     });
   }
 
-  openForm(item?: CatalogItem): void {
-    const modal = this.modalService.create<CatalogEdit, { catalogType: CatalogType; itemId?: number }, CatalogItem>({
-      nzTitle: `${item ? 'Edit' : 'Add'} ${this.catalogType === 'categories' ? 'category' : 'weight'}`,
-      nzContent: CatalogEdit,
-      nzData: { catalogType: this.catalogType, itemId: item?.id },
+  openForm(item?: InventoryMetadataItem): void {
+    const modal = this.modalService.create<InventoryMetadataEdit, { metadataType: InventoryMetadataType; itemId?: number }, InventoryMetadataItem>({
+      nzTitle: `${item ? 'Edit' : 'Add'} ${this.metadataType === 'categories' ? 'category' : 'weight'}`,
+      nzContent: InventoryMetadataEdit,
+      nzData: { metadataType: this.metadataType, itemId: item?.id },
       nzFooter: null,
       nzMaskClosable: false
     });
@@ -64,7 +64,7 @@ export class CatalogComponent implements OnInit {
     });
   }
 
-  confirmDelete(item: CatalogItem): void {
+  confirmDelete(item: InventoryMetadataItem): void {
     this.modalService.confirm({
       nzTitle: `Delete ${item.name}?`,
       nzContent: 'This cannot be undone.',
@@ -73,13 +73,13 @@ export class CatalogComponent implements OnInit {
       nzCancelText: 'Cancel'
     }).afterClose.subscribe((confirmed) => {
       if (confirmed === true) {
-        this.catalogService.delete(this.catalogType, item.id).subscribe({
+        this.metadataService.delete(this.metadataType, item.id).subscribe({
           next: () => {
             this.message.success(`${item.name} deleted`);
             this.loadItems();
           },
           error: (error) => {
-            console.error(`Error deleting ${this.catalogType.slice(0, -1)}:`, error);
+            console.error(`Error deleting ${this.metadataType.slice(0, -1)}:`, error);
             this.message.error(`Could not delete ${item.name}. It may be used by inventory.`);
           }
         });

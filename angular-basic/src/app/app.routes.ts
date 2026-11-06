@@ -6,12 +6,12 @@ export const routes: Routes = [
   { path: 'inventory', loadChildren: () => import('./pages/inventory/inventory.routes').then(m => m.INVENTORY_ROUTES) },
   {
     path: 'categories',
-    loadComponent: () => import('./pages/catalog/catalog').then(m => m.CatalogComponent),
-    data: { catalogType: 'categories' }
+    loadComponent: () => import('./pages/inventory-metadata/inventory-metadata').then(m => m.InventoryMetadataComponent),
+    data: { metadataType: 'categories' }
   },
   {
     path: 'weights',
-    loadComponent: () => import('./pages/catalog/catalog').then(m => m.CatalogComponent),
-    data: { catalogType: 'weights' }
+    loadComponent: () => import('./pages/inventory-metadata/inventory-metadata').then(m => m.InventoryMetadataComponent),
+    data: { metadataType: 'weights' }
   }
 ];
